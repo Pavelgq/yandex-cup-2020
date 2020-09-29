@@ -31,13 +31,12 @@ class MyClock extends Framework.Clock {
         }));
 
         this.tick = 0;
-        this.reset = true;
+        this.reset = false;
     }
 
     onAfterTick() {
         const [arrow] = this.arrows;
-
-        // console.log("after: " + arrow.pos);  
+ 
     }
 
     onBeforeTick() {
@@ -51,7 +50,7 @@ class MyClock extends Framework.Clock {
         sArrow.rotateFactor = getRotateFactor(sArrow.pos, relative.seconds, this.reset);
         mArrow.rotateFactor = getRotateFactor(mArrow.pos, relative.minutes, this.reset);
         hArrow.rotateFactor = getRotateFactor(hArrow.pos, relative.hours, this.reset);
-        dArrow.rotateFactor = getRotateFactor(dArrow.pos, relative.days, this.reset); 
+        dArrow.rotateFactor = getRotateFactor(dArrow.pos, relative.days, this.reset);
         !sArrow.rotateFactor && !mArrow.rotateFactor && !hArrow.rotateFactor && !dArrow.rotateFactor && (this.reset = false)
     }
 
@@ -68,7 +67,6 @@ function getRelativePos(ticks) {
     const minutes = Math.floor(ts / 60) % 60 * 360 / 60;
     const hours = Math.floor(ts / (60 * 60)) % 12 * 360 / 12;
     const days = Math.floor(ts / (60 * 60 * 24)) % 60 * 360 / 60;
-    console.log('sec', seconds);
     return {
         days,
         hours,
@@ -80,16 +78,9 @@ function getRelativePos(ticks) {
 function getRotateFactor(pos, target, reset = false) {
     let newAngle = target - pos;
 
-    if (!reset) {
-        if (newAngle < 0) {
+    if (newAngle < 0) 
             newAngle += 360;
-        }
-    } else {
-        if (newAngle < 0)
-            newAngle += 360
-
-    }
-    console.log(newAngle);
-    const factor = Math.floor((newAngle / Framework.SPEED) * 10) / 10;
+    
+    const factor = 1 / Framework.SPEED * newAngle;
     return Math.abs(factor) > MAX_FACTOR ? MAX_FACTOR : factor;
 }
