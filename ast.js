@@ -211,7 +211,7 @@ module.exports = function (ast) {
         }
         let property = getPropName(callee, scope),
             object = callee.object;
-        if (property !== 'n') {
+        if (property !== 'y') {
             return;
         }
 
@@ -226,7 +226,7 @@ module.exports = function (ast) {
         }
         property = getPropName(object, scope);
         object = object.object;
-        if (property !== 'y') {
+        if (property !== 'x') {
             return;
         }
 
@@ -238,7 +238,7 @@ module.exports = function (ast) {
         }
 
         if (object.type !== 'Identifier' ||
-            object.name !== 'Z') {
+            object.name !== 'M') {
             return;
         }
 
