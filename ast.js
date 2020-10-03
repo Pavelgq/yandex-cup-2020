@@ -194,11 +194,11 @@ module.exports = function (ast) {
             return;
         }
         let args = node.arguments;
-        if (args.length !== 1 ||
-            args[0].type !== 'FunctionExpression') {
+        if (args.length !== 0) {
             return;
         }
-        let callee = node.callee;
+        let callee = node.callee; 
+        let res = node.callee;
 
         let resolved = scope.resolve(callee);
         if (resolved) {
@@ -209,75 +209,69 @@ module.exports = function (ast) {
         if (callee.type !== 'MemberExpression') {
             return;
         }
-        let property = getPropName(callee, scope),
-            object = callee.object;
+        let property = getPropName(callee, scope), //y
+            object = callee.object; //New Expression
+
         if (property !== 'y') {
             return;
         }
+        if (object.type !== 'NewExpression') {
+            return;
+        }
 
         resolved = scope.resolve(object);
         if (resolved) {
-            object = resolved.value;
+            callee = resolved.value;
             scope = resolved.scope;
         }
 
-        if (object.type !== 'MemberExpression') {
+        args = object.arguments;
+        if (args.length !== 1 ||
+            args[0].type !== 'ObjectExpression') {
             return;
         }
-        property = getPropName(object, scope);
-        object = object.object;
-        if (property !== 'x') {
+        callee = object.callee; 
+          
+        if (callee.name !== 'M') {
             return;
         }
+        
+        checkObject(args[0])
 
-        resolved = scope.resolve(object);
-        let zScope;
-        if (resolved) {
-            object = resolved.value;
-            zScope = resolved.scope;
-        }
-
-        if (object.type !== 'Identifier' ||
-            object.name !== 'M') {
-            return;
-        }
-
-        if (zScope && zScope !== rootScope) {
-            return;
-        }
-
-        checkFunction(args[0]);
+        result.push(res.property)
     });
 
-    function checkFunction(ast) {
-        let firstArg = ast.params[0];
-        if (!firstArg) {
-            return;
-        }
+    function checkObject(ast) {
 
         traverse(ast, (node, scope, parent) => {
             if (parent === ast) {
                 return;
             }
-            if (node.type !== 'Identifier') {
+            if (node.type !== 'ObjectExpression') {
                 return;
             }
-            if (!parent) {
-                return;
+            
+            let prop = node.properties;
+
+            if (prop.length === 0) {
+                return
             }
-            if (parent.type === 'MemberExpression' &&
-                parent.computed === false &&
-                parent.property === node) {
-                return;
-            }
-            if (parent.type === 'ObjectProperty' &&
-                parent.key === node) {
-                return;
+            let property;
+            for (let i = 0; i < prop.length; i++) {
+                property = prop[i];
+                if (property.key.name === 'x') {
+                    break;
+                }
             }
 
-            let resolved = scope.resolve(node);
-            if (resolved && resolved.value === firstArg) {
-                result.push(node);
+            if (!property) {
+                return
+            }
+
+            let value = property.value;
+
+            if (value.type !== 'StringLiteral') {
+                return
             }
         });
     }
