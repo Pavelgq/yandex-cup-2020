@@ -186,6 +186,13 @@ module.exports = function (ast) {
             scope.add(node.id.name, node.init);
         }
     });
+    
+    traverse(ast, (node, scope) => {
+        if (node.type === 'AssignmentExpression') {
+            scope.add(node.left.name, node.right);
+        }
+    });
+
 
     let rootScope = getScopeFor(ast);
 
@@ -209,29 +216,50 @@ module.exports = function (ast) {
         if (callee.type !== 'MemberExpression') {
             return;
         }
+
         let property = getPropName(callee, scope), //y
             object = callee.object; //New Expression
 
-        if (property !== 'y') {
-            return;
-        }
-        if (object.type !== 'NewExpression') {
+        if (property !== 'y' &&
+            callee.property.type !== 'TemplateLiteral') {
             return;
         }
 
         resolved = scope.resolve(object);
         if (resolved) {
+            object = resolved.value;
+            scope = resolved.scope;
+        }
+
+        if (object.type !== 'NewExpression') {
+            return;
+        }
+
+        
+
+        args = object.arguments;
+        if (args.length !== 1 ) {
+            return;
+        }
+
+        resolved = scope.resolve(args[0]);
+        if (resolved) {
+            args[0] = resolved.value;
+            scope = resolved.scope;
+        }
+
+        if (args[0].type !== 'ObjectExpression') {
+           return
+        }
+        
+        callee = object.callee;
+
+        resolved = scope.resolve(callee);
+        if (resolved) {
             callee = resolved.value;
             scope = resolved.scope;
         }
 
-        args = object.arguments;
-        if (args.length !== 1 ||
-            args[0].type !== 'ObjectExpression') {
-            return;
-        }
-        callee = object.callee; 
-          
         if (callee.name !== 'M') {
             return;
         }
