@@ -189,7 +189,22 @@ module.exports = function (ast) {
     
     traverse(ast, (node, scope) => {
         if (node.type === 'AssignmentExpression') {
-            scope.add(node.left.name, node.right);
+            if (node.left.type === 'MemberExpression'){
+                let resolved = scope.resolve(node.left.object);
+                if (resolved) {
+                    object = resolved.value;
+                    scope = resolved.scope;
+                }
+                object.properties.push(node.left.property)
+                let propName = getPropName(node.left, scope)
+
+                scope.add(propName, node.right);
+
+            }else {
+                scope.add(node.left.name, node.right);
+            }
+
+            
         }
     });
 
@@ -263,46 +278,47 @@ module.exports = function (ast) {
         if (callee.name !== 'M') {
             return;
         }
-        
-        checkObject(args[0])
-
-        result.push(res.property)
-    });
-
-    function checkObject(ast) {
-
-        traverse(ast, (node, scope, parent) => {
-            if (parent === ast) {
-                return;
-            }
-            if (node.type !== 'ObjectExpression') {
-                return;
-            }
-            
-            let prop = node.properties;
+        let value = ''
+        if (args[0].properties.length === 0) {
+            return
+        } else {
+            let prop = args[0].properties;
 
             if (prop.length === 0) {
                 return
             }
-            let property;
+            let curProperty;
             for (let i = 0; i < prop.length; i++) {
-                property = prop[i];
-                if (property.key.name === 'x') {
+                curProperty = prop[i];
+                if (curProperty.value === 'x') {
+                    value = curProperty
                     break;
                 }
+                if (typeof curProperty['key'] !== "undefined") {
+                    if (curProperty.key.name === 'x') {
+                        value = curProperty.value;
+                        break;
+                    }
+                }
             }
-
-            if (!property) {
+    
+            if (!curProperty) {
                 return
             }
-
-            let value = property.value;
-
+    
+            
+    
             if (value.type !== 'StringLiteral') {
                 return
             }
-        });
-    }
+    
+            result.push(res.property)
+        }
+        
+
+
+        
+    });
 
     return result;
 };
