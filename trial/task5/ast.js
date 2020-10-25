@@ -1,5 +1,3 @@
-
-
 const scopeStorage = new Map();
 
 function getScopeFor(ast, outerScope) {
@@ -186,25 +184,10 @@ module.exports = function (ast) {
             scope.add(node.id.name, node.init);
         }
     });
-    
+
     traverse(ast, (node, scope) => {
         if (node.type === 'AssignmentExpression') {
-            if (node.left.type === 'MemberExpression'){
-                let resolved = scope.resolve(node.left.object);
-                if (resolved) {
-                    object = resolved.value;
-                    scope = resolved.scope;
-                }
-                object.properties.push(node.left.property)
-                let propName = getPropName(node.left, scope)
-
-                scope.add(propName, node.right);
-
-            }else {
-                scope.add(node.left.name, node.right);
-            }
-
-            
+            scope.add(node.left.name, node.right);
         }
     });
 
@@ -219,7 +202,7 @@ module.exports = function (ast) {
         if (args.length !== 0) {
             return;
         }
-        let callee = node.callee; 
+        let callee = node.callee;
         let res = node.callee;
 
         let resolved = scope.resolve(callee);
@@ -250,10 +233,10 @@ module.exports = function (ast) {
             return;
         }
 
-        
+
 
         args = object.arguments;
-        if (args.length !== 1 ) {
+        if (args.length !== 1) {
             return;
         }
 
@@ -263,61 +246,71 @@ module.exports = function (ast) {
             scope = resolved.scope;
         }
 
-        if (args[0].type !== 'ObjectExpression') {
-           return
-        }
-        
-        callee = object.callee;
+        if (args[0].type === 'ObjectExpression') {
+            callee = object.callee;
 
-        resolved = scope.resolve(callee);
-        if (resolved) {
-            callee = resolved.value;
-            scope = resolved.scope;
-        }
-
-        if (callee.name !== 'M') {
-            return;
-        }
-        let value = ''
-        if (args[0].properties.length === 0) {
-            return
-        } else {
-            let prop = args[0].properties;
-
-            if (prop.length === 0) {
-                return
+            resolved = scope.resolve(callee);
+            if (resolved) {
+                callee = resolved.value;
+                scope = resolved.scope;
             }
-            let curProperty;
-            for (let i = 0; i < prop.length; i++) {
-                curProperty = prop[i];
-                if (curProperty.value === 'x') {
-                    value = curProperty
-                    break;
+
+            if (callee.name !== 'M') {
+                return;
+            }
+            let value = ''
+            if (args[0].properties.length === 0) {
+                return
+            } else {
+                let prop = args[0].properties;
+
+                if (prop.length === 0) {
+                    return
                 }
-                if (typeof curProperty['key'] !== "undefined") {
-                    if (curProperty.key.name === 'x') {
-                        value = curProperty.value;
+                let curProperty;
+                for (let i = 0; i < prop.length; i++) {
+                    curProperty = prop[i];
+                    if (curProperty.value === 'x') {
+                        value = curProperty
                         break;
                     }
+                    if (typeof curProperty['key'] !== "undefined") {
+                        if (curProperty.key.name === 'x') {
+                            value = curProperty.value;
+                            break;
+                        }
+                    }
                 }
+
+                if (!curProperty) {
+                    return
+                }
+
+                resolved = scope.resolve(value);
+                if (resolved) {
+                    value = resolved.value;
+                    scope = resolved.scope;
+                }
+
+                if (value.type !== 'StringLiteral') {
+                    return
+                }
+
+                result.push(res.property)
             }
-    
-            if (!curProperty) {
+        }
+        if (args[0].type === 'AssignmentExpression') {
+            property = getPropName(args[0].left, scope); 
+            if (property !== 'x') {
                 return
             }
-    
-            
-    
-            if (value.type !== 'StringLiteral') {
+            if (args[0].right.type !== 'StringLiteral') {
                 return
             }
-    
             result.push(res.property)
         }
-        
 
 
-        
     });
 
     return result;

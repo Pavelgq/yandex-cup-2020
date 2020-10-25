@@ -1,0 +1,511 @@
+<html>
+
+<head>
+  <style>
+    body {
+      display: flex;
+      /* box-sizing: border-box; */
+    }
+
+    .map {
+      display: flex;
+      flex-wrap: wrap;
+      background: #6c4080;
+      padding-top: 1px;
+      justify-content: space-evenly
+    }
+
+    .cube {
+      display: flex;
+      width: 30px;
+      height: 30px;
+
+      /* flex: 1 1 auto;
+            margin: 0 1px; */
+    }
+
+    .empty {
+      background: #35004d;
+      color: #ffa03f
+    }
+
+    .wall {
+      background: linear-gradient(to bottom, #ffb971 10%, #ffa03f 10%, #ffa03f 50%, #ff7a00 50%);
+    }
+
+    .move-block--first {
+      position: relative;
+      background: #c100ff;
+      box-sizing: border-box;
+    }
+
+    .move-block--first::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 3px;
+      right: 3px;
+      background-color: #dd71ff;
+    }
+
+
+
+    .move-block--second {
+      position: relative;
+      background: #00ff73;
+      box-sizing: border-box;
+
+    }
+
+    .move-block--second::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 3px;
+      right: 3px;
+      background-color: #71ffc9;
+      opacity: 0.8;
+    }
+
+    .fix-block--first {
+      position: relative;
+      background: #00e0ff;
+      box-sizing: border-box;
+
+    }
+
+    .fix-block--first::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      bottom: 3px;
+      left: 8px;
+      right: 8px;
+      background-color: #00434d;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="map">
+
+
+  </div>
+  <div class="controller">
+    <button class="control_action_left">влево </button>
+    <button class="control_action_down">вниз</button>
+    <button class="control_action_right">вправо</button>
+
+  </div>
+
+  <script>
+    "use strict";
+    
+    window.onGameReady = () => {
+      class Playfield {
+        constructor() {
+          this.root = document.querySelector('.map');
+
+        }
+
+
+        render(field) {
+          this.root.innerHTML = '';
+          for (let i = 0; i < field.length; i++) {
+            const line = field[i];
+            for (let j = 0; j < line.length; j++) {
+              const el = line[j];
+              const block = document.createElement('DIV');
+              block.classList.add('cube')
+              switch (el) {
+                case '#':
+                  block.classList.add('wall');
+                  break;
+                case '.':
+                  block.classList.add('empty');
+                  break;
+                case 'o':
+                  block.classList.add('move-block--first');
+                  break;
+                case 'O':
+                  block.classList.add('fix-block--first');
+                  break;
+                default:
+                  block.classList.remove('cube');
+                  break;
+              }
+              if (block.classList.length) {
+                this.root.appendChild(block);
+              }
+            }
+
+          }
+        }
+
+
+      }
+
+      class Game {
+        constructor() {
+          this.playfield = new Playfield();
+          this.field = [];
+          this.figure = [];
+          this.figureId = 0;
+          this.wall = 1;
+          this.mod = 1;
+
+          this.getField();
+          this.getFigure();
+
+          this.playfield.root.style.width = `${this.field[this.field.length-1].length * 31}px`;
+          this.playfield.root.style.height = `${this.field.length * 31}px`;
+
+          this.moveLeft = this.moveLeft.bind(this);
+          this.moveRight = this.moveRight.bind(this);
+          this.moveDown = this.moveDown.bind(this);
+
+        }
+
+
+        getField() {
+          this.field = [];
+          let lines = window.map.split('\n');
+          lines.forEach(el => {
+            if (el.trim()) {
+              this.field.push(el.trim().split(''));
+            }
+
+          })
+
+        }
+
+        getFigure(i) {
+          this.figure = [];
+          for (let i = 0; i < this.field.length; i++) {
+            const line = this.field[i];
+            for (let j = 0; j < line.length; j++) {
+              const el = line[j];
+              if (el === 'o' || el === 'q') {
+                this.figure.push({
+                  x: j,
+                  y: i
+                });
+              }
+
+            }
+          }
+        }
+
+        createFigure(i) {
+          let x = Math.floor(this.field[0].length / 2);
+          let figure = []
+          switch (i) {
+            case 0:
+              figure = [{
+                x: x,
+                y: 0,
+              }]
+              break;
+            case 1:
+              figure = [{
+                  x: x,
+                  y: 0,
+                },
+                {
+                  x: x,
+                  y: 1,
+                },
+                {
+                  x: x + 1,
+                  y: 0,
+                },
+                {
+                  x: x + 1,
+                  y: 1,
+                },
+              ]
+              break;
+            case 2:
+              figure = [{
+                  x: x,
+                  y: 0,
+                },
+                {
+                  x: x,
+                  y: 1,
+                },
+                {
+                  x: x + 1,
+                  y: 1,
+                },
+              ]
+              break;
+            case 3:
+              figure = [{
+                  x: x,
+                  y: 1,
+                },
+                {
+                  x: x + 1,
+                  y: 0,
+                },
+                {
+                  x: x + 1,
+                  y: 1,
+                },
+              ]
+              break;
+            case 4:
+              figure = [{
+                  x: x,
+                  y: 0,
+                },
+                {
+                  x: x,
+                  y: 1,
+                },
+                {
+                  x: x + 1,
+                  y: 0,
+                },
+              ]
+              break;
+            case 5:
+              figure = [{
+                  x: x,
+                  y: 0,
+                },
+                {
+                  x: x,
+                  y: 1,
+                },
+                {
+                  x: x,
+                  y: 2,
+                },
+              ]
+              break;
+            default:
+              break;
+          }
+
+
+          if (this.checkPos(figure)) {
+            this.figure = figure;
+            this.figure.forEach(el => {
+              this.field[el.y][el.x] = 'o';
+            })
+            this.playfield.render(this.field);
+          } else {
+            this.endGame();
+          }
+        }
+
+        moveLeft() {
+          if (this.checkPos(this.figure, 'left')) {
+            let simbol = this.field[this.figure[0].y][this.figure[0].x];
+            this.figure.forEach(el => {
+              this.field[el.y][el.x] = '.'
+            })
+            for (let i = 0; i < this.figure.length; i++) {
+              this.figure[i].x -= 1;
+              this.field[this.figure[i].y][this.figure[i].x] = simbol
+            }
+            this.playfield.render(this.field);
+            this.moveDown();
+          } else {
+            this.moveDown();
+          }
+        }
+        moveRight() {
+          if (this.checkPos(this.figure, 'right')) {
+            let simbol = this.field[this.figure[0].y][this.figure[0].x];
+            this.figure.forEach(el => {
+              this.field[el.y][el.x] = '.'
+            })
+            for (let i = 0; i < this.figure.length; i++) {
+              this.figure[i].x += 1;
+              this.field[this.figure[i].y][this.figure[i].x] = simbol
+            }
+            this.playfield.render(this.field);
+            this.moveDown();
+          } else {
+            this.moveDown();
+          }
+
+
+        }
+        moveDown() {
+
+          if (this.checkPos(this.figure, 'down')) {
+            let simbol = this.field[this.figure[0].y][this.figure[0].x];
+            this.figure.forEach(el => {
+              this.field[el.y][el.x] = '.'
+            })
+            for (let i = 0; i < this.figure.length; i++) {
+              this.figure[i].y += 1;
+              this.field[this.figure[i].y][this.figure[i].x] = simbol
+            }
+            this.playfield.render(this.field);
+            this.modeWall();
+          } else {
+            this.fixFigure()
+            this.modeWall();
+          }
+
+        }
+
+
+        checkPos(figure, move = 'new') {
+          if (move === 'new') {
+            return !figure.some(el => {
+              if (this.field[el.y][el.x] !== '.') {
+                return true;
+              }
+            })
+          }
+          if (move === 'down') {
+            return !figure.some(el => {
+              if (this.field[el.y + 1][el.x] !== '.' && this.field[el.y + 1][el.x] !== 'o') {
+                return true;
+              }
+            })
+          }
+          if (move === 'left') {
+            return !figure.some(el => {
+              if (this.field[el.y][el.x - 1] !== '.' && this.field[el.y][el.x - 1] !== 'o') {
+                return true;
+              }
+            })
+          }
+
+          if (move === 'right') {
+            return !figure.some(el => {
+              if (this.field[el.y][el.x + 1] !== '.' && this.field[el.y][el.x + 1] !== 'o') {
+                return true;
+              }
+            })
+          }
+        }
+
+        modeWall() {
+          this.wall += 1 * this.mod;
+          console.log(this.wall)
+
+
+
+          for (let i = this.field.length - 2; i >= 0; i--) {
+            let line = this.field[i];
+            if (this.mod > 0) {
+              if (!this.activeFigure(i, this.wall - 1)) {
+                this.field[i][this.wall - 1] = '#';
+              }
+              if (!this.activeFigure(i, line.length - this.wall)) {
+                this.field[i][line.length - this.wall] = '#';
+              }
+            } else {
+              if (!this.activeFigure(i, this.wall)) {
+                this.field[i][this.wall] = '.';
+              }
+              if (!this.activeFigure(i, line.length - this.wall - 1)) {
+                this.field[i][line.length - this.wall - 1] = '.';
+              }
+            }
+
+
+          }
+          if (this.wall === 5 || this.wall === 1) {
+            this.mod *= -1;
+          }
+          this.playfield.render(this.field);
+        }
+
+        activeFigure(y, x) {
+          return this.field[y][x] === 'o'
+        }
+
+        fixFigure() {
+          this.figureId += 1;
+          this.figure.forEach(el => {
+            this.field[el.y][el.x] = 'O';
+          })
+          this.checkField();
+          this.playfield.render(this.field);
+          this.createFigure(this.figureId);
+        }
+
+        checkField() {
+          for (let i = 0; i < this.field.length - 1; i++) {
+            let line = this.field[i];
+            let j = 1;
+            while (line[j] === line[j + 1] && line[j] != '.') {
+              if (j < line.length - 3) {
+                j += 1;
+              } else {
+                this.delLine(i);
+                break;
+              }
+            }
+          }
+        }
+
+        delLine(num) {
+          for (let i = num; i >= 0; i--) {
+            let line = this.field[i];
+            for (let j = 1; j < line.length - 1; j++) {
+              if (i !== 0) {
+                this.field[i][j] = this.field[i - 1][j];
+              } else {
+                this.field[i][j] = '.';
+              }
+
+            }
+          }
+
+        }
+
+        endGame() {
+          for (let i = 0; i < this.field.length; i++) {
+            let line = this.field[i];
+            for (let j = 0; j < line.length; j++) {
+              if (this.field[i][j] !== '.') {
+                this.field[i][j] = '#'
+              }
+            }
+          }
+          this.playfield.render(this.field);
+          reserEvents()
+        }
+
+      }
+
+
+      const game = new Game();
+      game.playfield.render(game.field);
+
+      const leftBtn = document.querySelector('.control_action_left');
+      const downBtn = document.querySelector('.control_action_down');
+      const rightBtn = document.querySelector('.control_action_right');
+
+      leftBtn.addEventListener('click', game.moveLeft);
+      downBtn.addEventListener('click', game.moveDown);
+      rightBtn
+        .addEventListener('click', game.moveRight);
+
+      function reserEvents() {
+        leftBtn.removeEventListener('click', game.moveLeft);
+        downBtn.removeEventListener('click', game.moveDown);
+        rightBtn.removeEventListener('click', game.moveRight);
+      }
+    };
+
+
+
+    document.addEventListener("DOMContentLoaded", window.onGameReady);
+  </script>
+
+</body>
+
+</html>
