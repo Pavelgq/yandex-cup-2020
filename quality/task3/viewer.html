@@ -250,6 +250,7 @@ const script = document.createElement('script'),
     }, 5000);
 script.src = 'var.js';
 script.onload = () => {
+    console.log('Запуск')
     clearTimeout(loadTimeout);
     go();
 };
