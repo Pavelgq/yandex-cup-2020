@@ -24,7 +24,7 @@
     "GALAXY-42/SYSTEM/PLANET:{Simple text... @null == undefined@}",  
     "GALAXY-42/SYSTEM/PLANET:{@typeof null@@typeof typeof null@}"  
 ]
-Формат вывода
+## Формат вывода
 [  
     "GALAXY-42/SYSTEM/PLANET:{}",  
     "GALAXY-42/SYSTEM/PLANET:{Code}",  
