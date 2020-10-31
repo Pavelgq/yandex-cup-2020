@@ -9,19 +9,19 @@ module.exports = function (data, api) {
         return (r + g + b) / 3;
     }
 
-    function makeCaching(f) {
-        var cache = {};
+    // function makeCaching(f) {
+    //     var cache = {};
 
-        return function(x) {
-          if (!(x in cache)) {
-            cache[x] = f.call(this, x);
-          }
-          return cache[x];
-        };
+    //     return function(x) {
+    //       if (!(x in cache)) {
+    //         cache[x] = f.call(this, x);
+    //       }
+    //       return cache[x];
+    //     };
 
-      }
+    //   }
 
-      getValueFactory = makeCaching(getValueFactory);
+    //   getValueFactory = makeCaching(getValueFactory);
 
     function getValueFactory(mathFunction, bite) {
         
