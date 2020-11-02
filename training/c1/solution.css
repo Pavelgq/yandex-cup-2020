@@ -1,0 +1,40 @@
+/* Общая ширина: 180px
+Общая высота: 180px
+Высота желтой секции: 90px
+Ширина белой секции: 90px
+Радиус скругления: 9px
+Цвета:
+черный: #0c0c0c
+желтый: #f8e34b
+белый: #eeedef
+тень: #c8c8c8, 178 градусов
+ */
+
+.div {
+    display: block;
+    position: relative;
+    background-color: #f8e34b;
+    border-radius: 9px;
+    overflow: hidden;
+}
+
+.div::before {
+    position: absolute;
+    content: '';
+    width: 90px;
+    height: 90px;
+    bottom: 0;
+    left: 0;
+    background-color: #eeedef;
+    box-shadow: inset -4px 10px 6px -7px #c8c8c8;
+}
+
+.div::after {
+    position: absolute;
+    content: '';
+    width: 90px;
+    height: 90px;
+    bottom: 0;
+    right: 0;
+    background-color: #0c0c0c;
+}

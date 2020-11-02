@@ -6,14 +6,19 @@ const {
 } = require('chai');
 
 
-const task = require("../quality/task2/index");
-const data = require("../quality/task2/test");
+const task = require("../trial/task2/index");
+const data = require("../trial/task2/test");
 
 // const myArray = task(data.input);
 // const testArray = data.output;
 
-describe('test members', function() {
-    it('should pass', function() {
-        data.output.should.have.members(task(data.input));
-    });
+describe('test members', function () {
+    function makeTest(x) {
+        it('should pass', function () {
+            assert.deepEqual(data.output[x], task(data.input[x]));
+        });
+    }
+    for (let x = 0; x < data.input.length; x++) {
+        makeTest(x);
+    }
 });

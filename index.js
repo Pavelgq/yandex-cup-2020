@@ -1,9 +1,9 @@
 
-const task = require("./quality/task2/index");
-const test = require("./quality/task2/test");
+const task = require("./training/a1/a1");
+const test = require("./training/a1/test");
 
 
-const myArray = task(test.input);
-const testArray = test.output;
+const ans = task(test.input[0]);
+const testAns = test.output[0];
 
-console.log(myArray, testArray)
+console.log(ans, testAns)

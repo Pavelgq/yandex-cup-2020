@@ -1,11 +1,8 @@
-'use struct'
-
-const checkMod = function () {};
-
-const bem = function (str) {
+module.exports = function(str) {  
   let res;
   let newStr =str;
   let [, elem, mod] = newStr.match(/[a-z]+(?:([^a-z]+)[a-z]+(?:\1)?[a-z]+)([^a-z]+)[a-z]+(?:\2)?[a-z]+/);
+
   while (elem == mod) {
     const regexp =  new RegExp(elem, "gi");
     res = regexp.exec(newStr);
@@ -18,13 +15,12 @@ const bem = function (str) {
   console.log(elem);
   const n = str.split(elem);
   const m = str.split(mod);
-  if (n < m) {
+  console.log(elem, n, m);
+  if (n.length <= m.length) {
     [elem, mod] = [mod, elem];
   }
   return {
     elem: elem,
     mod: mod
-  };
-};
-
-console.log(bem("dfs__fdsffd__sf_dsf"));
+  }ж
+}
