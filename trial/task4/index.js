@@ -4,7 +4,7 @@
     | Command | Description | **Is implemented** |  
     | ---: | :--- | :---: |  
     | **git status** | List all new or modified files | **Yes** |  
-    | **git diff** | Show file differences that haven’t been staged | No |
+    | **git diff** | Show file differences that haven't been staged | No |
     Первая встретившаяся строка в таблице должна всегда превращаться в строку-заголовок в markdown-разметке. 
     Все остальные строки идут в тело таблицы. 
     Разделитель заголовка выводится всегда.

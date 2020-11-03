@@ -8,7 +8,13 @@
 function calcFontSize(container, str, min, max) {
     const width = parseInt(container.style.width);
     const height = parseInt(container.style.height);
-    container.innerText = str;
+    const element = document.createElement('SPAN');
+    element.innerText = str;
+    container.appendChild(element);
+    let textSize = element.getBoundingClientRect();
+
+    console.log(textSize);
+
     let first = min;
     let last = max;
     let found = false;
@@ -17,7 +23,7 @@ function calcFontSize(container, str, min, max) {
     while (found === false && first <= last) {
         middle = Math.floor((first + last) / 2);
         container.style.fontSize = middle + 'px';
-        textSize = inlineSize(container);
+        textSize =  element.getBoundingClientRect();
         if (textSize.width == width) {
             found = true;
         } else if (textSize.width > width) {
@@ -27,7 +33,7 @@ function calcFontSize(container, str, min, max) {
         }
     }
     container.style.fontSize = middle + 'px';
-        textSize = inlineSize(container);
+        textSize =  element.getBoundingClientRect();
     // if (textSize.width > width) {
     //     middle = null;
     // }
@@ -36,7 +42,7 @@ function calcFontSize(container, str, min, max) {
         while (textSize.height > height && middle >= min) {
             middle -= 1;
             container.style.fontSize = middle + 'px';
-            textSize = inlineSize(container);
+            textSize =  element.getBoundingClientRect();
         }
         if (middle < min) {
             middle = null
