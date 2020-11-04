@@ -1,6 +1,6 @@
 
-const task = require("./training/f1/f1");
-const test = require("./training/f1/test");
+const task = require("./training/f2/f2");
+const test = require("./training/f2/test");
 
 
 const ans = task(test.input);
