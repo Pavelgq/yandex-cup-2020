@@ -1,0 +1,46 @@
+/* Общая ширина: 180px
+Общая высота: 180px
+Размер секции 90 на 90px
+Цвета:
+темная секция: #654430
+светлая секция: #f7ebcc
+Шашка:
+основной цвет #5f5d5e
+обводка #252324
+общий радиус: 28px
+толщина обводки: 3px */
+
+
+div {
+    position: relative;
+    background: 
+  linear-gradient(45deg, #654430 25%, transparent 25%, transparent 75%, #654430 75%, #654430), 
+  linear-gradient(45deg, #654430 25%, transparent 25%, transparent 75%, #654430 75%, #654430),
+  #f7ebcc;
+background-position: 0 0, 90px 90px;
+background-size: 180px 180px;
+
+
+}
+
+div::before {
+    content: '';
+    position: absolute;
+    top: 17px;
+    left: 17px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-image: radial-gradient(circle closest-side, #5f5d5e 21px, #333 21px, #333 24px, #5f5d5e 25px, #5f5d5e 28px);
+}
+
+div::after {
+    content: '';
+    position: absolute;
+    bottom: 17px;
+    right: 17px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-image: radial-gradient(circle closest-side, #5f5d5e 21px, #333 21px, #333 24px, #5f5d5e 25px, #5f5d5e 28px);
+}
